@@ -14,6 +14,8 @@ const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.
 
 const app = express();
 
+const session      = require('express-session');
+
 // require database configuration
 require('./configs/db.config');
 
@@ -28,6 +30,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
+
+//express session setup
+app.use(
+    session({
+      secret: 'my secret',
+      cookie: {maxAge:10000},
+      rolling: true
+    })
+  )
+
 
 // default value for title local
 app.locals.title = 'Express - Generated with IronGenerator';

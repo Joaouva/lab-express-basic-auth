@@ -47,5 +47,47 @@ User.findOne({'username': username})
 });
 });
 
+router.get("/login", (req, res) => {
+    res.render("auth/login");
+  });
+  
+  router.post('/login', (req,res) =>{
+    const {username, password} = req.body;
+  
+    if (!username || !password) {
+      res.render('auth/login', {
+        errorMessage: 'Please enter both username and password'
+      });
+      return;
+    }
+  
+  User.findOne({'username': username})
+  .then((user) => {
+    if(!user) {
+      res.render('auth/login' , {
+        errorMessage: 'Invalid login'
+      })
+      //user doesn't exist in the DB
+      return;
+    }
+  
+    if (bcrypt.compareSync(password, user.password)) {
+    //Login sucessfully
+    req.session.currentUser = user;
+    res.redirect('/');
+    res.render('index', { user })
+    } else {
+      //password don't match
+      res.render('/auth/login' , {
+        errorMessage: 'Invalid login'
+      });
+    }
+  });
+  })
+  
+  router.post('/logout', (req,res) => {
+   req.session.destroy();
+   res.redirect('/');
+  });
 
 module.exports = router;
